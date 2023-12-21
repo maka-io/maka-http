@@ -1,5 +1,5 @@
 import { URL } from "meteor/url";
-import HTTPCommon from "./httpcall_common";
+import HTTPCommon from "./http-common";
 
 interface ClientOptions {
   content?: string;
@@ -57,12 +57,7 @@ class HTTPClient extends HTTPCommon {
         };
 
         this.populateData(response);
-
-        if (xhr.status >= 400) {
-          reject(this.makeErrorByStatus(xhr.status, response.content));
-        } else {
-          resolve(response);
-        }
+        resolve(response);
       };
 
       xhr.onerror = () => reject(new Error("Network error"));

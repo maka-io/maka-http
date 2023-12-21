@@ -1,6 +1,6 @@
 import { fetch } from 'meteor/fetch';
 import { URL, URLSearchParams } from 'meteor/url';
-import HTTPCommon from './httpcall_common';
+import HTTPCommon from './http-common';
 
 interface ServerOptions {
   content?: string;
@@ -69,7 +69,7 @@ class HTTPServer extends HTTPCommon {
       httpResponse.headers[key] = value;
     }
 
-    HTTPCommon.populateData(httpResponse);
+    this.populateData(httpResponse);
 
     return httpResponse;
   }

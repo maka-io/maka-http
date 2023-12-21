@@ -17,8 +17,8 @@ Package.onUse(function (api) {
     'typescript'
   ]);
 
-  api.mainModule('src/httpcall_client.ts', 'client');
-  api.mainModule('src/httpcall_server.ts', 'server');
+  api.mainModule('src/http-client.ts', 'client');
+  api.mainModule('src/http-server.ts', 'server');
 });
 
 Package.onTest(function (api) {
@@ -30,8 +30,8 @@ Package.onTest(function (api) {
   api.use('tinytest');
   api.use('test-helpers', ['client', 'server']);
 
-  api.addFiles('test_responder.js', 'server');
-  api.addFiles('httpcall_tests.js', ['client', 'server']);
+  api.addFiles('test-responder.js', 'server');
+  api.addFiles('http-tests.js', ['client', 'server']);
 
   api.addAssets('test_static.serveme', 'client');
 });

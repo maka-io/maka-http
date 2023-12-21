@@ -1,15 +1,6 @@
 class HTTPCommon {
   static MAX_LENGTH: number = 500;
 
-  static makeErrorByStatus(statusCode: number, content: any): Error {
-    let message: string = "failed [" + statusCode + "]";
-    if (content) {
-      const stringContent: string = typeof content === "string" ? content : content.toString();
-      message += ' ' + this.truncate(stringContent.replace(/\n/g, ' '), this.MAX_LENGTH);
-    }
-    return new Error(message);
-  }
-
   static truncate(str: string, length: number): string {
     return str.length > length ? str.slice(0, length) + '...' : str;
   }
@@ -20,11 +11,12 @@ class HTTPCommon {
       try {
         response.data = JSON.parse(response.content);
       } catch (err) {
-        response.data = null;
+        response.data = response.content;
       }
     } else {
-      response.data = null;
+      response.data = response.content;
     }
+    delete response.content;
   }
 
   static setRequestHeaders(headers: { [key: string]: any }, request: XMLHttpRequest): void {
