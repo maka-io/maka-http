@@ -37,12 +37,12 @@ Currently:
 ```
     import { HTTP } from 'meteor/maka:http';
 
-    const response = await HTTP.get('url');
+    const { data, statusCode } = await HTTP.get('url');
 
-    if (response.statusCode > 400) {
-        console.error(response.data);
+    if (statusCode > 400) {
+        console.error(data);
     } else {
-        console.log(response);
+        console.log(data);
     }
 ```
 
