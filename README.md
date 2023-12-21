@@ -50,7 +50,7 @@ Currently:
 
 1. The response object no longer contains both a 'data' AND a 'content'.  It only
     contains the data object.  This object will be in a format based on the
-    content type.
+    content type. (e.g., 'application/json')
 
 2. All call, get, post, put, delete, and options return a Promise.  So
     they'll need to be async/await-ed.
@@ -59,7 +59,7 @@ Currently:
     more consistent in naming.
 
 4. If there is an error (400 or over), this will no longer return an Error object.
-    It will simply return the response from the server.
+    It will simply return the response from the server as it does with all other status codes.
 
 5. The tests are broken! I plan on fixing them, but I'm le` tired.
 
