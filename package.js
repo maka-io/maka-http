@@ -17,8 +17,8 @@ Package.onUse(function (api) {
     'typescript'
   ]);
 
-  api.mainModule('src/httpcall_client.js', 'client');
-  api.mainModule('src/httpcall_server.js', 'server');
+  api.mainModule('src/httpcall_client.ts', 'client');
+  api.mainModule('src/httpcall_server.ts', 'server');
 });
 
 Package.onTest(function (api) {

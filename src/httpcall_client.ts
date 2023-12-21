@@ -1,25 +1,33 @@
 import { URL } from "meteor/url";
 import HTTPCommon from "./httpcall_common";
 
-class HTTPClient extends HTTPCommon {
-  static async call(method, url, options = {}) {
-    method = (method || "").toUpperCase();
+interface ClientOptions {
+  content?: string;
+  data?: any;
+  params?: { [key: string]: any };
+  auth?: string;
+  headers?: { [key: string]: string };
+}
 
-    let headers = {};
+class HTTPClient extends HTTPCommon {
+  static async call(method: string, url: string, options: ClientOptions = {}): Promise<any> {
+    method = method.toUpperCase();
+
+    const headers: { [key: string]: string } = {};
     let content = options.content;
     if (options.data) {
       content = JSON.stringify(options.data);
       headers['Content-Type'] = 'application/json';
     }
 
-    let paramsForBody;
+    let paramsForUrl: any, paramsForBody: any;
     if (content || method === "GET" || method === "HEAD") {
       paramsForUrl = options.params;
     } else {
       paramsForBody = options.params;
     }
 
-    const constructedUrl = new URL(url); // Assuming URL construction logic here
+    const constructedUrl = new URL(url);
 
     if (options.auth) {
       const base64 = btoa(options.auth);
@@ -32,18 +40,14 @@ class HTTPClient extends HTTPCommon {
     }
 
     if (options.headers) {
-      for (const [key, value] of Object.entries(options.headers)) {
-        headers[key] = value;
-      }
+      Object.assign(headers, options.headers);
     }
 
     return new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
       xhr.open(method, constructedUrl.toString(), true);
 
-      for (const [key, value] of Object.entries(headers)) {
-        xhr.setRequestHeader(key, value);
-      }
+      this.setRequestHeaders(headers, xhr);
 
       xhr.onload = () => {
         let response = {
@@ -67,4 +71,4 @@ class HTTPClient extends HTTPCommon {
   }
 }
 
-export { HTTPClient as HTTP }
+export { HTTPClient as HTTP };

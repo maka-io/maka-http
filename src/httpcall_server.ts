@@ -2,15 +2,24 @@ import { fetch } from 'meteor/fetch';
 import { URL, URLSearchParams } from 'meteor/url';
 import HTTPCommon from './httpcall_common';
 
+interface ServerOptions {
+  content?: string;
+  data?: any;
+  params?: { [key: string]: any };
+  auth?: string;
+  headers?: { [key: string]: string };
+  followRedirects?: boolean;
+}
+
 class HTTPServer extends HTTPCommon {
-  static async call(method, url, options = {}) {
+  static async call(method: string, url: string, options: ServerOptions = {}): Promise<any> {
     if (!/^https?:\/\//.test(url)) {
       throw new Error('URL must be absolute and start with http:// or https://');
     }
 
-    method = (method || '').toUpperCase();
+    method = method.toUpperCase();
 
-    const headers = {};
+    const headers: { [key: string]: string } = {};
     let content = options.content;
 
     if (options.data) {
@@ -18,8 +27,8 @@ class HTTPServer extends HTTPCommon {
       headers['Content-Type'] = 'application/json';
     }
 
-    let paramsForBody;
-    if (!(content || method === 'GET' || method === 'HEAD')) {
+    let paramsForBody: any;
+    if (!(content || ['GET', 'HEAD'].includes(method))) {
       paramsForBody = options.params;
     }
 
@@ -31,45 +40,38 @@ class HTTPServer extends HTTPCommon {
     }
 
     if (paramsForBody) {
-      const data = new URLSearchParams();
-      for (const [key, value] of Object.entries(paramsForBody)) {
-        data.append(key, value);
-      }
+      const data = new URLSearchParams(paramsForBody);
       content = data.toString();
       headers['Content-Type'] = 'application/x-www-form-urlencoded';
     }
 
     if (options.headers) {
-      for (const [key, value] of Object.entries(options.headers)) {
-        headers[key] = value;
-      }
+      Object.assign(headers, options.headers);
     }
 
     const requestOptions = {
       method,
-      body: content !== undefined ? content : null,
+      body: content,
       headers,
       redirect: options.followRedirects === false ? 'manual' : 'follow',
     };
 
-    try {
-      const response = await fetch(newUrl.toString(), requestOptions);
-      const responseContent = await response.text();
+    const response = await fetch(newUrl.toString(), requestOptions);
+    const responseContent = await response.text();
 
-      const httpResponse = {
-        statusCode: response.status,
-        content: responseContent,
-        headers: {}
-      };
+    const httpResponse = {
+      statusCode: response.status,
+      content: responseContent,
+      headers: {}
+    };
 
-      this.setRequestHeaders(httpResponse.headers, response);
-
-      this.populateData(httpResponse);
-
-      return httpResponse;
-    } catch (error) {
-      throw error;
+    for (const [key, value] of response.headers.entries()) {
+      httpResponse.headers[key] = value;
     }
+
+    HTTPCommon.populateData(httpResponse);
+
+    return httpResponse;
   }
 }
 
