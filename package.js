@@ -2,7 +2,7 @@ Package.describe({
   name: 'maka:http',
   summary: "Make HTTP calls to remote servers",
   version: '1.0.0',
-  git: 'https://github.com/maka-io/maka-http'
+  git: 'https://github.com/maka-io/maka-http.git'
 });
 
 Npm.depends({
@@ -10,6 +10,9 @@ Npm.depends({
 });
 
 Package.onUse(function (api) {
+  // Minimum Meteor version
+  api.versionsFrom(['2.0', '3.0-alpha.19']);
+
   api.use([
     'url',
     'ecmascript',
@@ -31,8 +34,8 @@ Package.onTest(function (api) {
   api.use('tinytest');
   api.use('test-helpers', ['client', 'server']);
 
-  api.addFiles('test-responder.js', 'server');
-  api.addFiles('http-tests.js', ['client', 'server']);
+  api.addFiles('tests/test-responder.js', 'server');
+  api.addFiles('tests/http-tests.js', ['client', 'server']);
 
-  api.addAssets('test_static.serveme', 'client');
+  api.addAssets('tests/test-static.serveme', 'client');
 });

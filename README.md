@@ -16,7 +16,7 @@ If you're using maka-cli:
 ```
 
 ## Docs
-This is the next generation of the Meteor HTTP package.  It generally adheres to
+This is just an iteration of the Meteor HTTP package.  It generally adheres to
 the original HTTP contracts, but the calls return Promises and no longer use
 callbacks.
 
