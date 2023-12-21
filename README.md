@@ -17,7 +17,7 @@ If you're using maka-cli:
 
 ## Docs
 This is the next generation of the Meteor HTTP package.  It generally adheres to
-the original HTTP contracts, but the calls are return promises and no longer use
+the original HTTP contracts, but the calls return Promises and no longer use
 callbacks.
 
 Previously:
@@ -37,11 +37,12 @@ Currently:
 ```
     import { HTTP } from 'meteor/maka:http';
 
-    try {
-        const response = await HTTP.get('url');
+    const response = await HTTP.get('url');
+
+    if (response.statusCode > 400) {
+        console.error(response.data);
+    } else {
         console.log(response);
-    } catch (error) {
-        console.error(error);
     }
 ```
 
