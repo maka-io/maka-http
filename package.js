@@ -2,13 +2,11 @@ Package.describe({
   name: 'maka:http',
   summary: "Make HTTP calls to remote servers",
   version: '1.0.0',
-  deprecated: 'Upgraded HTTP package to use async/await.'
 });
 
 Npm.depends({
   '@types/meteor': '2.9.7',
 });
-
 
 Package.onUse(function (api) {
   api.use([
@@ -19,11 +17,8 @@ Package.onUse(function (api) {
     'typescript'
   ]);
 
-  api.mainModule('httpcall_client.js', 'client');
-  api.mainModule('httpcall_server.js', 'server');
-
-  api.export('HTTP');
-  api.export('HTTPInternals', 'server');
+  api.mainModule('src/httpcall_client.js', 'client');
+  api.mainModule('src/httpcall_server.js', 'server');
 });
 
 Package.onTest(function (api) {
