@@ -2,6 +2,7 @@ Package.describe({
   name: 'maka:http',
   summary: "Make HTTP calls to remote servers",
   version: '1.0.0',
+  git: 'https://github.com/maka-io/maka-http'
 });
 
 Npm.depends({
