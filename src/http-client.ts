@@ -1,25 +1,20 @@
 import HTTPCommon from "./http-common";
-import {
-  HTTPClient as IHTTPClient,
-  HTTPCommon as IHTTPCommon
-} from '@maka/types';
+import { HTTPClient as IHTTPClient, HTTPCommon as IHTTPCommon } from '@maka/types';
 
 class HTTPClient extends HTTPCommon {
   static async call(method: string, url: string, options: IHTTPClient.Options = {}): Promise<IHTTPCommon.HTTPResponse> {
+    // Process interceptors and set up headers and body
     for (const interceptor of this.requestInterceptors) {
       const result = await interceptor(method, url, options);
       url = result.url;
       options = result.options;
     }
 
-    // Ensure options is an object
     options = options || {};
-    // Ensure options.headers is an object
     options.headers = options.headers || {};
-
     method = method.toUpperCase();
 
-    const headers: HeadersInit = new Headers(options.headers || {});
+    const headers: HeadersInit = new Headers(options.headers);
     let body: BodyInit | null = null;
 
     if (options.data) {
@@ -29,40 +24,36 @@ class HTTPClient extends HTTPCommon {
       body = options.content;
     }
 
-    // Process paramsForUrl and paramsForBody
-    if (options.params) {
-      const params = new URLSearchParams(options.params);
-      if (['GET', 'HEAD'].includes(method)) {
-        url += '?' + params.toString();
-      } else {
-        body = params.toString();
-        headers.set('Content-Type', 'application/x-www-form-urlencoded');
-      }
-    }
-
+    // Construct fetch options
     const fetchOptions: RequestInit = {
       method: method,
       headers: headers,
       body: body,
     };
 
-    let response = await fetch(url, fetchOptions);
-    for (const interceptor of this.responseInterceptors) {
-      response = await interceptor(response);
-    }
+    // Create the fetch promise
+    const fetchPromise = fetch(url, fetchOptions).then(async response => {
+      // Process the response
+      const responseContent = await response.text();
 
-    const responseContent = await response.text();
+      const httpResponse: IHTTPCommon.HTTPResponse = {
+        statusCode: response.status,
+        content: responseContent,
+        headers: this.parseResponseHeaders(response.headers)
+      };
 
-    const httpResponse: IHTTPCommon.HTTPResponse = {
-      statusCode: response.status,
-      content: responseContent,
-      headers: this.parseResponseHeaders(response.headers)
-    };
+      this.populateData(httpResponse);
+      return httpResponse;
+    });
 
-    this.populateData(httpResponse);
+    // Create the timeout promise
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("Request timed out")), options.timeout);
+    });
 
-    return httpResponse;
+    // Race the fetch against the timeout
+    return Promise.race([fetchPromise, timeoutPromise]);
+  }
 }
 
 export { HTTPClient as HTTP };
-

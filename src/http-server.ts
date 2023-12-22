@@ -1,11 +1,7 @@
 import { fetch } from 'meteor/fetch';
 import { URL, URLSearchParams } from 'meteor/url';
 import HTTPCommon from './http-common';
-import {
-  HTTPServer as IHTTPServer,
-  HTTPCommon as IHTTPCommon
-} from '@maka/types';
-
+import { HTTPServer as IHTTPServer, HTTPCommon as IHTTPCommon } from '@maka/types';
 
 class HTTPServer extends HTTPCommon {
   static async call(method: string, url: string, options: IHTTPServer.Options = {}): Promise<IHTTPCommon.HTTPResponse> {
@@ -13,17 +9,15 @@ class HTTPServer extends HTTPCommon {
       throw new Error('URL must be absolute and start with http:// or https://');
     }
 
+    // Process interceptors
     for (const interceptor of this.requestInterceptors) {
       const result = await interceptor(method, url, options);
       url = result.url;
       options = result.options;
     }
 
-    // Ensure options is an object
     options = options || {};
-    // Ensure options.headers is an object
-    options.headers = options?.headers || {};
-
+    options.headers = options.headers || {};
     method = method.toUpperCase();
 
     const headers: { [key: string]: string } = {};
@@ -34,7 +28,7 @@ class HTTPServer extends HTTPCommon {
       headers['Content-Type'] = 'application/json';
     }
 
-    let paramsForBody: any;
+    let paramsForBody;
     if (!(content || ['GET', 'HEAD'].includes(method))) {
       paramsForBody = options.params;
     }
@@ -58,27 +52,32 @@ class HTTPServer extends HTTPCommon {
       redirect: options.followRedirects === false ? 'manual' : 'follow',
     };
 
-    let response = await fetch(newUrl.toString(), requestOptions);
-    for (const interceptor of this.responseInterceptors) {
-      response = await interceptor(response);
-    }
+    const fetchPromise = fetch(newUrl.toString(), requestOptions).then(async response => {
+      // Process the response
+      const responseContent = await response.text();
 
-    const responseContent = await response.text();
+      const httpResponse = {
+        statusCode: response.status,
+        content: responseContent,
+        headers: {}
+      };
 
-    const httpResponse = {
-      statusCode: response.status,
-      content: responseContent,
-      headers: {}
-    };
+      for (const [key, value] of response.headers.entries()) {
+        httpResponse.headers[key] = value;
+      }
 
-    for (const [key, value] of response.headers.entries()) {
-      httpResponse.headers[key] = value;
-    }
+      this.populateData(httpResponse);
 
-    this.populateData(httpResponse);
+      return httpResponse;
+    });
 
-    return httpResponse;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("Request timed out")), options.timeout || 3000);
+    });
+
+    return Promise.race([fetchPromise, timeoutPromise]);
   }
 }
 
 export { HTTPServer as HTTP };
+
