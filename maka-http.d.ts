@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 declare module 'meteor/maka:http' {
     namespace HTTP {
       interface ServerOptions {
@@ -21,8 +20,6 @@ declare module 'meteor/maka:http' {
         headers?: { [id: string]: string } | undefined;
         data?: any;
       }
-
-      type AsyncCallback = (error: Meteor.Error | null, result?: HTTPResponse) => void;
 
       function call(
         method: string,

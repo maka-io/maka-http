@@ -7,7 +7,7 @@
     "preserveSymlinks": true,
     "paths": {
       "meteor/*": [
-        ".meteor/local/types/http.d.ts"
+        ".meteor/local/types/maka-http.d.ts"
       ]
     }
   },

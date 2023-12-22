@@ -2,9 +2,16 @@ import { fetch } from 'meteor/fetch';
 import { URL, URLSearchParams } from 'meteor/url';
 import HTTPCommon from './http-common';
 
+interface ServerOptions {
+  data?: any;
+  params?: { [key: string]: any };
+  auth?: string;
+  headers?: { [key: string]: string };
+  followRedirects?: boolean;
+}
 
 class HTTPServer extends HTTPCommon {
-  static async call(method: string, url: string, options: ServerOptions = {}): Promise<HTTPResponse> {
+  static async call(method: string, url: string, options: ServerOptions = {}): Promise<any> {
     if (!/^https?:\/\//.test(url)) {
       throw new Error('URL must be absolute and start with http:// or https://');
     }
