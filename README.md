@@ -58,7 +58,11 @@ Currently:
 3. If there is an error (400 or over), this will no longer return an Error object.
     It will simply return the response from the server as it does with all other status codes.
 
-4. The tests are broken! I plan on fixing them, but I'm le` tired.
+4. The tests are broken! I plan on fixing them.
+
+5. There is no longer an 'auth' option.  To declare 'auth' use the headers section.
+
+6. 'npmRequestOptions' and 'beforeSend' have been removed, not sure it actually did anything in the end 🤔
 
 See the [HTTP section in the Meteor docs](http://docs.meteor.com/#http) for more details...
 but with a grain of salt, based on the changes above, and that Meteor has deprecated those

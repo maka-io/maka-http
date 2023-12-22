@@ -1,17 +1,11 @@
 import { fetch } from 'meteor/fetch';
 import { URL, URLSearchParams } from 'meteor/url';
 import HTTPCommon from './http-common';
+import { HTTPServer as IHTTPServer, HTTPCommon as IHTTPCommon } from '@maka/types';
 
-interface ServerOptions {
-  data?: any;
-  params?: { [key: string]: any };
-  auth?: string;
-  headers?: { [key: string]: string };
-  followRedirects?: boolean;
-}
 
 class HTTPServer extends HTTPCommon {
-  static async call(method: string, url: string, options: ServerOptions = {}): Promise<any> {
+  static async call(method: string, url: string, options: IHTTPServer.Options = {}): Promise<IHTTPCommon.HTTPResponse> {
     if (!/^https?:\/\//.test(url)) {
       throw new Error('URL must be absolute and start with http:// or https://');
     }
@@ -32,11 +26,6 @@ class HTTPServer extends HTTPCommon {
     }
 
     const newUrl = new URL(url);
-
-    if (options.auth) {
-      const base64 = Buffer.from(options.auth, 'ascii').toString('base64');
-      headers['Authorization'] = `Basic ${base64}`;
-    }
 
     if (paramsForBody) {
       const data = new URLSearchParams(paramsForBody);

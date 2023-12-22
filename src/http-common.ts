@@ -1,3 +1,9 @@
+import {
+  HTTPCommon as IHTTPCommon,
+  HTTPServer as IHTTPServer,
+  HTTPClient as IHTTPClient
+} from '@maka/types';
+
 class HTTPCommon {
   static MAX_LENGTH: number = 500;
 
@@ -36,28 +42,28 @@ class HTTPCommon {
     return headers;
   }
 
-  static async get(url: string, callOptions?: any): Promise<any> {
+  static async get(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
     return this.call("GET", url, callOptions);
   }
 
-  static async post(url: string, callOptions?: any): Promise<any> {
+  static async post(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
     return this.call("POST", url, callOptions);
   }
 
-  static async put(url: string, callOptions?: any): Promise<any> {
+  static async put(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
     return this.call("PUT", url, callOptions);
   }
 
-  static async del(url: string, callOptions?: any): Promise<any> {
+  static async del(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
     return this.call("DELETE", url, callOptions);
   }
 
-  static async patch(url: string, callOptions?: any): Promise<any> {
+  static async patch(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
     return this.call("PATCH", url, callOptions);
   }
 
   // Define the call method as abstract (not implemented)
-  static async call(method: string, url: string, options?: any): Promise<any> {
+  static async call(method: string, url: string, options?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
     throw new Error("Method 'call' must be implemented");
   }
 }
