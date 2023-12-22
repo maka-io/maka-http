@@ -1,16 +1,9 @@
 import { URL } from "meteor/url";
 import HTTPCommon from "./http-common";
 
-interface ClientOptions {
-  content?: string;
-  data?: any;
-  params?: { [key: string]: any };
-  auth?: string;
-  headers?: { [key: string]: string };
-}
 
 class HTTPClient extends HTTPCommon {
-  static async call(method: string, url: string, options: ClientOptions = {}): Promise<any> {
+  static async call(method: string, url: string, options: ClientOptions = {}): Promise<HTTPResponse> {
     method = method.toUpperCase();
 
     const headers: { [key: string]: string } = {};

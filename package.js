@@ -1,7 +1,7 @@
 Package.describe({
   name: 'maka:http',
   summary: "Make HTTP calls to remote servers",
-  version: '1.0.1',
+  version: '1.0.2',
   git: 'https://github.com/maka-io/maka-http.git'
 });
 
@@ -30,6 +30,7 @@ Package.onTest(function (api) {
   api.use('webapp', 'server');
   api.use('underscore');
   api.use('random');
+  api.use('zodern:types');
   api.use('http', ['client', 'server']);
   api.use('tinytest');
   api.use('test-helpers', ['client', 'server']);

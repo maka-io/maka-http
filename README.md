@@ -55,13 +55,10 @@ Currently:
 2. All call, get, post, put, delete, and options return a Promise.  So
     they'll need to be async/await-ed.
 
-3. There is now a 'delete' method along side the 'del'.  They do the same thing, just
-    more consistent in naming.
-
-4. If there is an error (400 or over), this will no longer return an Error object.
+3. If there is an error (400 or over), this will no longer return an Error object.
     It will simply return the response from the server as it does with all other status codes.
 
-5. The tests are broken! I plan on fixing them, but I'm le` tired.
+4. The tests are broken! I plan on fixing them, but I'm le` tired.
 
 See the [HTTP section in the Meteor docs](http://docs.meteor.com/#http) for more details...
 but with a grain of salt, based on the changes above, and that Meteor has deprecated those

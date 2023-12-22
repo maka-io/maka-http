@@ -3,10 +3,16 @@
     "target": "es5",
     "module": "commonjs",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "preserveSymlinks": true,
+    "paths": {
+      "meteor/*": [
+        ".meteor/local/types/http.d.ts"
+      ]
+    }
   },
   "include": [
-    "./lib/**/*.ts",
-    "./*.d.ts"
+    "./src/**/*.ts",
+    "./**/*.d.ts"
   ]
 }
