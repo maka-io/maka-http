@@ -1,4 +1,3 @@
-import { URL } from "meteor/url";
 import HTTPCommon from "./http-common";
 import {
   HTTPClient as IHTTPClient,
@@ -9,52 +8,47 @@ class HTTPClient extends HTTPCommon {
   static async call(method: string, url: string, options: IHTTPClient.Options = {}): Promise<IHTTPCommon.HTTPResponse> {
     method = method.toUpperCase();
 
-    const headers: { [key: string]: string } = {};
-    let content = options.content;
+    const headers: HeadersInit = new Headers(options.headers || {});
+    let body: BodyInit | null = null;
+
     if (options.data) {
-      content = JSON.stringify(options.data);
-      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(options.data);
+      headers.set('Content-Type', 'application/json');
+    } else if (options.content) {
+      body = options.content;
     }
 
-    let paramsForUrl: any, paramsForBody: any;
-    if (content || method === "GET" || method === "HEAD") {
-      paramsForUrl = options.params;
-    } else {
-      paramsForBody = options.params;
+    // Process paramsForUrl and paramsForBody
+    if (options.params) {
+      const params = new URLSearchParams(options.params);
+      if (['GET', 'HEAD'].includes(method)) {
+        url += '?' + params.toString();
+      } else {
+        body = params.toString();
+        headers.set('Content-Type', 'application/x-www-form-urlencoded');
+      }
     }
 
-    const constructedUrl = new URL(url);
+    const fetchOptions: RequestInit = {
+      method: method,
+      headers: headers,
+      body: body,
+    };
 
-    if (paramsForBody) {
-      content = new URLSearchParams(paramsForBody).toString();
-      headers['Content-Type'] = 'application/x-www-form-urlencoded';
-    }
+    const response = await fetch(url, fetchOptions);
+    const responseContent = await response.text();
 
-    if (options.headers) {
-      Object.assign(headers, options.headers);
-    }
+    const httpResponse: IHTTPCommon.HTTPResponse = {
+      statusCode: response.status,
+      content: responseContent,
+      headers: this.parseResponseHeaders(response.headers)
+    };
 
-    return new Promise((resolve, reject) => {
-      let xhr = new XMLHttpRequest();
-      xhr.open(method, constructedUrl.toString(), true);
+    this.populateData(httpResponse);
 
-      this.setRequestHeaders(headers, xhr);
-
-      xhr.onload = () => {
-        let response = {
-          statusCode: xhr.status,
-          content: xhr.responseText,
-          headers: this.parseResponseHeaders(xhr.getAllResponseHeaders())
-        };
-
-        this.populateData(response);
-        resolve(response);
-      };
-
-      xhr.onerror = () => reject(new Error("Network error"));
-      xhr.send(content);
-    });
+    return httpResponse;
   }
 }
 
 export { HTTPClient as HTTP };
+

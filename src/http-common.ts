@@ -31,14 +31,11 @@ class HTTPCommon {
     }
   }
 
-  static parseResponseHeaders(headerStr: string): { [key: string]: string } {
+  static parseResponseHeaders(headersObj: Headers): { [key: string]: string } {
     const headers: { [key: string]: string } = {};
-    for (const line of headerStr.trim().split(/[\r\n]+/)) {
-      const parts: string[] = line.split(': ');
-      const header: string | undefined = parts.shift();
-      const value: string = parts.join(': ');
-      if (header) headers[header] = value;
-    }
+    headersObj.forEach((value, key) => {
+      headers[key] = value;
+    });
     return headers;
   }
 
