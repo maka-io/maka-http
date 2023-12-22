@@ -1,7 +1,10 @@
 import { fetch } from 'meteor/fetch';
 import { URL, URLSearchParams } from 'meteor/url';
 import HTTPCommon from './http-common';
-import { HTTPServer as IHTTPServer, HTTPCommon as IHTTPCommon } from '@maka/types';
+import {
+  HTTPServer as IHTTPServer,
+  HTTPCommon as IHTTPCommon
+} from '@maka/types';
 
 
 class HTTPServer extends HTTPCommon {
