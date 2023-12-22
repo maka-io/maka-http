@@ -6,6 +6,17 @@ import {
 
 class HTTPClient extends HTTPCommon {
   static async call(method: string, url: string, options: IHTTPClient.Options = {}): Promise<IHTTPCommon.HTTPResponse> {
+    for (const interceptor of this.requestInterceptors) {
+      const result = await interceptor(method, url, options);
+      url = result.url;
+      options = result.options;
+    }
+
+    // Ensure options is an object
+    options = options || {};
+    // Ensure options.headers is an object
+    options.headers = options.headers || {};
+
     method = method.toUpperCase();
 
     const headers: HeadersInit = new Headers(options.headers || {});
@@ -35,7 +46,11 @@ class HTTPClient extends HTTPCommon {
       body: body,
     };
 
-    const response = await fetch(url, fetchOptions);
+    let response = await fetch(url, fetchOptions);
+    for (const interceptor of this.responseInterceptors) {
+      response = await interceptor(response);
+    }
+
     const responseContent = await response.text();
 
     const httpResponse: IHTTPCommon.HTTPResponse = {
@@ -47,7 +62,6 @@ class HTTPClient extends HTTPCommon {
     this.populateData(httpResponse);
 
     return httpResponse;
-  }
 }
 
 export { HTTPClient as HTTP };

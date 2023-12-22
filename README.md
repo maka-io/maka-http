@@ -64,6 +64,20 @@ Currently:
 
 6. 'npmRequestOptions' and 'beforeSend' have been removed, not sure it actually did anything in the end 🤔
 
+7. There are now interceptors that will allow you to catch either the request before it goes out,
+    or the response just before it's handled.
+    They can be added on the server or client, with the same signature.
+
+```typescript
+HTTP.addRequestInterceptor(async (method, url, options) => {
+  if (method === 'GET') {
+    console.log('Intercepted GET request to URL:', url);
+  }
+  return { method, url, options };
+});
+```
+
+
 See the [HTTP section in the Meteor docs](http://docs.meteor.com/#http) for more details...
 but with a grain of salt, based on the changes above, and that Meteor has deprecated those
 documents 😉.

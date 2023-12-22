@@ -204,9 +204,9 @@
       "integrity": "sha512-UvFa/vR+e19XookZF8RzFZBrw2EUkQWxiBW0yYQAhvk3C+QVGl0H3ouca8LDBlBfQKXwmW3huo/59H8rwb1wJw=="
     },
     "@maka/types": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/@maka/types/-/types-1.0.0.tgz",
-      "integrity": "sha512-0aaIkozC1gre8NBpkR428vqPzmDjXg6vlcFU67QNLhcaIL0EPLLVTIZJLtHo2J8D7t4/KkEdKRYXDKd7tj1eZQ=="
+      "version": "1.0.2",
+      "resolved": "https://registry.npmjs.org/@maka/types/-/types-1.0.2.tgz",
+      "integrity": "sha512-DslnmU7Hm5yQgTVv16UmQNJmPEp8VOOthcZhhEuNN+IA2NraJzbi/gni0mybm5/6w1IfXktXNGBdzYC76S+rfg=="
     },
     "@mongodb-js/saslprep": {
       "version": "1.1.1",

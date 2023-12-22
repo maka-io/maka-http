@@ -13,6 +13,17 @@ class HTTPServer extends HTTPCommon {
       throw new Error('URL must be absolute and start with http:// or https://');
     }
 
+    for (const interceptor of this.requestInterceptors) {
+      const result = await interceptor(method, url, options);
+      url = result.url;
+      options = result.options;
+    }
+
+    // Ensure options is an object
+    options = options || {};
+    // Ensure options.headers is an object
+    options.headers = options?.headers || {};
+
     method = method.toUpperCase();
 
     const headers: { [key: string]: string } = {};
@@ -47,7 +58,11 @@ class HTTPServer extends HTTPCommon {
       redirect: options.followRedirects === false ? 'manual' : 'follow',
     };
 
-    const response = await fetch(newUrl.toString(), requestOptions);
+    let response = await fetch(newUrl.toString(), requestOptions);
+    for (const interceptor of this.responseInterceptors) {
+      response = await interceptor(response);
+    }
+
     const responseContent = await response.text();
 
     const httpResponse = {

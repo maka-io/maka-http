@@ -4,8 +4,12 @@ import {
   HTTPClient as IHTTPClient
 } from '@maka/types';
 
+
+
 class HTTPCommon {
-  static MAX_LENGTH: number = 500;
+  protected static MAX_LENGTH: number = 500;
+  protected static requestInterceptors: IHTTPCommon.RequestInterceptor[] = [];
+  protected static responseInterceptors: IHTTPCommon.ResponseInterceptor[] = [];
 
   static truncate(str: string, length: number): string {
     return str.length > length ? str.slice(0, length) + '...' : str;
@@ -37,6 +41,14 @@ class HTTPCommon {
       headers[key] = value;
     });
     return headers;
+  }
+
+  static addRequestInterceptor(interceptor: IHTTPCommon.RequestInterceptor): void {
+    this.requestInterceptors.push(interceptor);
+  }
+
+  static addResponseInterceptor(interceptor: IHTTPCommon.ResponseInterceptor): void {
+    this.responseInterceptors.push(interceptor);
   }
 
   static async get(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
