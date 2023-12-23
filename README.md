@@ -60,7 +60,8 @@ Or migrate to:
 
 5. There is no longer an 'auth' option.  To declare 'auth' use the headers section.
 
-6. 'npmRequestOptions' and 'beforeSend' have been removed, not sure it actually did anything in the end 🤔
+6. 'npmRequestOptions' and 'beforeSend' have been removed, not sure it actually did anything in the end 🤔.
+    Instead of before send, use the new `HTTP.addRequestInterceptor()` method.
 
 7. There are now interceptors that will allow you to catch either the request before it goes out,
     or the response just before it's handled.
@@ -87,7 +88,7 @@ NOTE: If you are using callbacks, then you should include callback in the return
 
 
 8. There are now two options for retries: `maxRetries` and `retryDelay`.  Default is `maxRetry: 1` and `retryDelay: 1000`
-    Retry delays are in miliseconds (so default is 1 seconds), and they are exponential.
+    Retry delays are in miliseconds (so default is 1 second), and they are exponential.
     Usable on both Server and Client with the same interface.
 
 ```typescript
