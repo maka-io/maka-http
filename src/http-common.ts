@@ -5,7 +5,6 @@ import {
 } from '@maka/types';
 
 
-
 class HTTPCommon {
   protected static MAX_LENGTH: number = 500;
   protected static requestInterceptors: IHTTPCommon.RequestInterceptor[] = [];

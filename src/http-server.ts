@@ -3,79 +3,63 @@ import { URL, URLSearchParams } from 'meteor/url';
 import HTTPCommon from './http-common';
 import { HTTPServer as IHTTPServer, HTTPCommon as IHTTPCommon } from '@maka/types';
 
+
 class HTTPServer extends HTTPCommon {
   static async call(method: string, url: string, options: IHTTPServer.Options = {}): Promise<IHTTPCommon.HTTPResponse> {
-    if (!/^https?:\/\//.test(url)) {
-      throw new Error('URL must be absolute and start with http:// or https://');
-    }
+    let attempts = 0;
+    const maxRetries = options.maxRetries ?? 1;
+    let retryDelay = options.retryDelay ?? 1000;
 
-    // Process interceptors
-    for (const interceptor of this.requestInterceptors) {
-      const result = await interceptor(method, url, options);
-      url = result.url;
-      options = result.options;
-    }
+    while (attempts < maxRetries) {
+      try {
+        // Process interceptors
+        for (const interceptor of this.requestInterceptors) {
+          const result = await interceptor(method, url, options);
+          url = result.url;
+          options = result.options;
+        }
 
-    options = options || {};
-    options.headers = options.headers || {};
-    method = method.toUpperCase();
+        // Set up headers and content
+        const headers = options.headers || {};
+        if (options.data) {
+          headers['Content-Type'] = 'application/json';
+          content = JSON.stringify(options.data);
+        }
 
-    const headers: { [key: string]: string } = {};
-    let content = options.content;
+        const requestOptions = {
+          method: method.toUpperCase(),
+          body: content,
+          headers: headers,
+          redirect: options.followRedirects === false ? 'manual' : 'follow',
+        };
 
-    if (options.data) {
-      content = JSON.stringify(options.data);
-      headers['Content-Type'] = 'application/json';
-    }
+        // Fetch request with timeout
+        const fetchPromise = fetch(new URL(url).toString(), requestOptions).then(async response => {
+          const responseContent = await response.text();
+          return {
+            statusCode: response.status,
+            content: responseContent,
+            headers: this.parseResponseHeaders(response.headers)
+          };
+        });
 
-    let paramsForBody;
-    if (!(content || ['GET', 'HEAD'].includes(method))) {
-      paramsForBody = options.params;
-    }
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject("Request timed out"), options.timeout || 3000);
+        });
 
-    const newUrl = new URL(url);
-
-    if (paramsForBody) {
-      const data = new URLSearchParams(paramsForBody);
-      content = data.toString();
-      headers['Content-Type'] = 'application/x-www-form-urlencoded';
-    }
-
-    if (options.headers) {
-      Object.assign(headers, options.headers);
-    }
-
-    const requestOptions = {
-      method,
-      body: content,
-      headers,
-      redirect: options.followRedirects === false ? 'manual' : 'follow',
-    };
-
-    const fetchPromise = fetch(newUrl.toString(), requestOptions).then(async response => {
-      // Process the response
-      const responseContent = await response.text();
-
-      const httpResponse = {
-        statusCode: response.status,
-        content: responseContent,
-        headers: {}
-      };
-
-      for (const [key, value] of response.headers.entries()) {
-        httpResponse.headers[key] = value;
+        // Race the fetch against the timeout
+        const httpResponse = await Promise.race([fetchPromise, timeoutPromise]);
+        this.populateData(httpResponse);
+        return httpResponse;
+      } catch (error) {
+        attempts++;
+        if (attempts >= maxRetries) throw error;
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        retryDelay *= 2;  // Exponential backoff
       }
+    }
 
-      this.populateData(httpResponse);
-
-      return httpResponse;
-    });
-
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("Request timed out")), options.timeout || 3000);
-    });
-
-    return Promise.race([fetchPromise, timeoutPromise]);
+    throw "All retry attempts failed";
   }
 }
 
