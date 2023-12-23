@@ -61,7 +61,13 @@ Or migrate to:
 5. There is no longer an 'auth' option.  To declare 'auth' use the headers section.
 
 6. 'npmRequestOptions' and 'beforeSend' have been removed, not sure it actually did anything in the end 🤔.
-    Instead of before send, use the new `HTTP.addRequestInterceptor()` method.
+    Instead of before send, use the new `HTTP.addRequestInterceptor()` method (see #7). If you need raw repsonse data,
+    use `rawResponse` which will return an ArrayBuffer
+
+```typescript
+    const { data } = await HTTP.get(url, { rawResponse: true }); // data contains an ArrayBuffer
+```
+
 
 7. There are now interceptors that will allow you to catch either the request before it goes out,
     or the response just before it's handled.
@@ -98,7 +104,6 @@ NOTE: If you are using callbacks, then you should include callback in the return
       timeout: 2000
     });
 ```
-
 
 See the [HTTP section in the Meteor docs](http://docs.meteor.com/#http) for more details...
 but with a grain of salt, based on the changes above, and that Meteor has deprecated those

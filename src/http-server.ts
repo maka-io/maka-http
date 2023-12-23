@@ -31,28 +31,44 @@ class HTTPServer extends HTTPCommon {
           options = result.options;
         }
 
-        // Set up headers and content
         const headers = options.headers || {};
-        if (options.data) {
+        let content;
+
+        if (['POST', 'PUT', 'PATCH'].includes(method.toUpperCase()) && options.data) {
           headers['Content-Type'] = 'application/json';
           content = JSON.stringify(options.data);
         }
 
-        const requestOptions = {
+        const requestOptions: RequestInit = {
           method: method.toUpperCase(),
-          body: content,
           headers: headers,
           redirect: options.followRedirects === false ? 'manual' : 'follow',
         };
 
+        // Only add the body if there is content
+        if (content !== undefined) {
+          requestOptions.body = content;
+        }
+
         // Fetch request with timeout
         const fetchPromise = fetch(new URL(url).toString(), requestOptions).then(async response => {
-          const responseContent = await response.text();
-          return {
-            statusCode: response.status,
-            content: responseContent,
-            headers: this.parseResponseHeaders(response.headers)
-          };
+          if (options.rawResponse) {
+            let arrayBuffer = await response.arrayBuffer();
+            // Return the raw response
+            return {
+              statusCode: response.status,
+              content: arrayBuffer,
+              headers: this.parseResponseHeaders(response.headers)
+            };
+          } else {
+            // Normal processing of the response
+            const responseContent = await response.text();
+            return {
+              statusCode: response.status,
+              content: responseContent,
+              headers: this.parseResponseHeaders(response.headers)
+            };
+          }
         });
 
         const timeoutPromise = new Promise<never>((_, reject) => {
@@ -61,6 +77,7 @@ class HTTPServer extends HTTPCommon {
 
         // Race the fetch against the timeout
         const httpResponse = await Promise.race([fetchPromise, timeoutPromise]);
+
 
         // create the data property and drop the content
         this.populateData(httpResponse);

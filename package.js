@@ -1,13 +1,13 @@
 Package.describe({
   name: 'maka:http',
   summary: "Make HTTP calls to remote servers",
-  version: '1.1.6',
+  version: '1.1.7',
   git: 'https://github.com/maka-io/maka-http.git'
 });
 
 Npm.depends({
   '@types/meteor': '2.9.7',
-  '@maka/types': '1.0.5',
+  '@maka/types': '1.0.6',
   'node-fetch': '3.3.2'
 });
 

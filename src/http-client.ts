@@ -34,12 +34,23 @@ class HTTPClient extends HTTPCommon {
           if (options.data) headers.set('Content-Type', 'application/json');
 
           const fetchPromise = fetch(url, { method, headers, body }).then(async response => {
-            const responseContent = await response.text();
-            return {
-              statusCode: response.status,
-              content: responseContent,
-              headers: this.parseResponseHeaders(response.headers)
-            };
+            if (options.rawResponse) {
+              const arrayBuffer = await response.arrayBuffer();
+              // Return the raw response for handling by the caller
+              return {
+                statusCode: response.status,
+                content: arrayBuffer,
+                headers: this.parseResponseHeaders(response.headers)
+              };
+            } else {
+              // Normal processing of the response
+              const responseContent = await response.text();
+              return {
+                statusCode: response.status,
+                content: responseContent,
+                headers: this.parseResponseHeaders(response.headers)
+              };
+            }
           });
 
           const timeoutPromise = new Promise<never>((_, reject) => {
