@@ -69,12 +69,24 @@ Currently:
     They can be added on the server or client, with the same signature.
 
 ```typescript
-HTTP.addRequestInterceptor(async (method, url, options) => {
-  if (method === 'GET') {
-    console.log('Intercepted GET request to URL:', url);
-  }
-  return { method, url, options };
-});
+    HTTP.addRequestInterceptor(async (method, url, options) => {
+      if (method === 'GET') {
+        console.log('Intercepted GET request to URL:', url);
+      }
+      return { method, url, options };
+    });
+```
+
+8. There are now two options for retries: `maxRetries` and `retryDelay`.  Default is `maxRetry: 1` and `retryDelay: 1000`
+    Retry delays are in miliseconds (so default is 1 seconds), and they are exponential.
+    Usable on both Server and Client with the same interface.
+
+```typescript
+    const { data, statusCode } = await HTTP.get(url, {
+      retryDelay: 2000,
+      maxRetries: 3,
+      timeout: 2000
+    });
 ```
 
 
