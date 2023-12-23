@@ -17,10 +17,9 @@ If you're using maka-cli:
 
 ## Docs
 This is just an iteration of the Meteor HTTP package.  It generally adheres to
-the original HTTP contracts, but the calls return Promises and no longer use
-callbacks.
+the original HTTP contracts, but the calls can either return a Callback OR a Promise.
 
-Previously:
+You can still use:
 ```
     import { HTTP } from 'meteor/http';
 
@@ -33,7 +32,7 @@ Previously:
     });
 ```
 
-Currently:
+Or migrate to:
 ```
     import { HTTP } from 'meteor/maka:http';
 
@@ -52,8 +51,7 @@ Currently:
     contains the data object.  This object will be in a format based on the
     content type. (e.g., 'application/json')
 
-2. All call, get, post, put, delete, and options return a Promise.  So
-    they'll need to be async/await-ed.
+2. All call, get, post, put, del, and options will return a Promise only if a callback isn't defined. (see previous section)
 
 3. If there is an error (400 or over), this will no longer return an Error object.
     It will simply return the response from the server as it does with all other status codes.
