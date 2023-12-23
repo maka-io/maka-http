@@ -19,9 +19,9 @@ If you're using maka-cli:
 This is just an iteration of the Meteor HTTP package.  It generally adheres to
 the original HTTP contracts, but the calls can either return a Callback OR a Promise.
 
-You can still use:
+You can still use the old callback way (as in http/meteor):
 ```
-    import { HTTP } from 'meteor/http';
+    import { HTTP } from 'meteor/maka:http';
 
     HTTP.get('url', (error, response) => {
         if (error) {
@@ -74,6 +74,17 @@ Or migrate to:
       return { method, url, options };
     });
 ```
+
+NOTE: If you are using callbacks, then you should include callback in the return:
+```typescript
+    HTTP.addRequestInterceptor(async (method, url, options, callback) => {
+      if (method === 'GET') {
+        console.log('Intercepted GET request to URL:', url);
+      }
+      return { method, url, options, callback };
+    });
+```
+
 
 8. There are now two options for retries: `maxRetries` and `retryDelay`.  Default is `maxRetry: 1` and `retryDelay: 1000`
     Retry delays are in miliseconds (so default is 1 seconds), and they are exponential.
