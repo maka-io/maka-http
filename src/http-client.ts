@@ -31,7 +31,7 @@ class HTTPClient extends HTTPCommon {
           });
 
           const timeoutPromise = new Promise<never>((_, reject) => {
-            setTimeout(() => reject("Request timed out"), options.timeout ?? 3000);
+            setTimeout(() => reject("Request timed out"), options.timeout ?? 30000);
           });
 
           // Await the result of either the fetch or the timeout

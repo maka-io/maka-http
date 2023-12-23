@@ -44,7 +44,7 @@ class HTTPServer extends HTTPCommon {
         });
 
         const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject("Request timed out"), options.timeout || 3000);
+          setTimeout(() => reject("Request timed out"), options.timeout || 30000);
         });
 
         // Race the fetch against the timeout
