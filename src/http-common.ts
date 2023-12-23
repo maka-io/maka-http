@@ -50,28 +50,53 @@ class HTTPCommon {
     this.responseInterceptors.push(interceptor);
   }
 
-  static async get(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
-    return this.call("GET", url, callOptions);
+  static async get(
+    url: string,
+    optionsOrCallback?: IHTTPServer.Options | IHTTPClient.Options | ((error: any, result?: IHTTPCommon.HTTPResponse) => void),
+    callback?: (error: any, result?: IHTTPCommon.HTTPResponse) => void
+  ): Promise<IHTTPCommon.HTTPResponse> {
+    return this.call("GET", url, optionsOrCallback, callback);
   }
 
-  static async post(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
-    return this.call("POST", url, callOptions);
+  static async post(
+    url: string,
+    optionsOrCallback?: IHTTPServer.Options | IHTTPClient.Options | ((error: any, result?: IHTTPCommon.HTTPResponse) => void),
+    callback?: (error: any, result?: IHTTPCommon.HTTPResponse) => void
+  ): Promise<IHTTPCommon.HTTPResponse> {
+    return this.call("POST", url, optionsOrCallback, callback);
   }
 
-  static async put(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
-    return this.call("PUT", url, callOptions);
+  static async put(
+    url: string,
+    optionsOrCallback?: IHTTPServer.Options | IHTTPClient.Options | ((error: any, result?: IHTTPCommon.HTTPResponse) => void),
+    callback?: (error: any, result?: IHTTPCommon.HTTPResponse) => void
+  ): Promise<IHTTPCommon.HTTPResponse> {
+    return this.call("PUT", url, optionsOrCallback, callback);
   }
 
-  static async del(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
-    return this.call("DELETE", url, callOptions);
+  static async del(
+    url: string,
+    optionsOrCallback?: IHTTPServer.Options | IHTTPClient.Options | ((error: any, result?: IHTTPCommon.HTTPResponse) => void),
+    callback?: (error: any, result?: IHTTPCommon.HTTPResponse) => void
+  ): Promise<IHTTPCommon.HTTPResponse> {
+    return this.call("DELETE", url, optionsOrCallback, callback);
   }
 
-  static async patch(url: string, callOptions?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
-    return this.call("PATCH", url, callOptions);
+  static async patch(
+    url: string,
+    optionsOrCallback?: IHTTPServer.Options | IHTTPClient.Options | ((error: any, result?: IHTTPCommon.HTTPResponse) => void),
+    callback?: (error: any, result?: IHTTPCommon.HTTPResponse) => void
+  ): Promise<IHTTPCommon.HTTPResponse> {
+    return this.call("PATCH", url, optionsOrCallback, callback);
   }
 
   // Define the call method as abstract (not implemented)
-  static async call(method: string, url: string, options?: IHTTPServer.Options | IHTTPClient.Options): Promise<IHTTPCommon.HTTPResponse> {
+  static async call(
+    method: string,
+    url: string,
+    optionsOrCallback?: IHTTPServer.Options | IHTTPClient.Options | ((error: any, result?: IHTTPCommon.HTTPResponse) => void),
+    callback?: (error: any, result?: IHTTPCommon.HTTPResponse) => void
+  ): Promise<IHTTPCommon.HTTPResponse> {
     throw new Error("Method 'call' must be implemented");
   }
 }

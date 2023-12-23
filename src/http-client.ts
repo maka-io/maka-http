@@ -3,7 +3,19 @@ import { HTTPClient as IHTTPClient, HTTPCommon as IHTTPCommon } from '@maka/type
 
 
 class HTTPClient extends HTTPCommon {
-  static async call(method: string, url: string, options: IHTTPClient.Options = {}): Promise<IHTTPCommon.HTTPResponse> {
+  static async call(
+    method: string,
+    url: string,
+    optionsOrCallback?: IHTTPClient.Options | ((error: any, result?: IHTTPCommon.HTTPResponse) => void),
+    callback?: (error: any, result?: IHTTPCommon.HTTPResponse) => void
+  ): Promise<IHTTPCommon.HTTPResponse | void> {
+    let options: IHTTPClient.Options = {};
+    if (typeof optionsOrCallback === 'function') {
+      callback = optionsOrCallback;
+    } else if (optionsOrCallback) {
+      options = optionsOrCallback;
+    }
+
     try {
       let attempts = 0;
       const maxRetries = options.maxRetries ?? 1;
@@ -12,7 +24,7 @@ class HTTPClient extends HTTPCommon {
       while (attempts < maxRetries) {
         try {
           for (const interceptor of this.requestInterceptors) {
-            const result = await interceptor(method, url, options);
+            const result = await interceptor(method, url, options, callback);
             url = result.url;
             options = result.options;
           }
@@ -38,10 +50,26 @@ class HTTPClient extends HTTPCommon {
           const httpResponse = await Promise.race([fetchPromise, timeoutPromise]);
           this.populateData(httpResponse);
 
-          return httpResponse; // Return the successful response
+          // For drop in backwards compatibility, we return the result via callback
+          // if one is provided, otherwise we return the result via async/await
+          if (callback) {
+            // Callback pattern
+            callback(null, httpResponse);
+            return;
+          } else {
+            // Async/await pattern
+            return httpResponse;
+          }
         } catch (error) {
           // Retry logic
-          if (++attempts >= maxRetries) throw error;
+          if (++attempts >= maxRetries) {
+            if (callback) {
+              callback(error);  // Invoke callback with error after all retries
+              return;  // Exit function after callback
+            } else {
+              throw error;  // Throw error for async/await
+            }
+          }
           await new Promise(resolve => setTimeout(resolve, retryDelay));
           retryDelay *= 2;
         }
@@ -50,8 +78,8 @@ class HTTPClient extends HTTPCommon {
 
       throw "All retry attempts failed";
     } catch (error) {
-      console.log(error);
-      throw error;
+      if (callback) callback(error);
+      else throw error;
     }
   }
 }
