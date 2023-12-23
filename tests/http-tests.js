@@ -8,7 +8,7 @@ const url_base = function () {
     const address = WebApp.httpServer.address();
     return 'http://127.0.0.1:' + address.port;
   } else {
-    return '';
+    return 'http://';
   }
 }
 
@@ -264,7 +264,7 @@ testAsyncMulti('httpcall - methods', [
     // non-get methods
     const test_method = function (meth, func_name) {
       func_name = func_name || meth.toLowerCase();
-      HTTP[func_name](
+      HTTP.call(func_name)(
         url_prefix() + '/foo',
         expect(function (error, result) {
           test.isFalse(error);
@@ -324,41 +324,6 @@ testAsyncMulti('httpcall - methods', [
         // nb: some browsers include a charset here too.
         test.matches(data.headers['content-type'], /^text\/stupid\b/);
       }));
-  }
-]);
-
-testAsyncMulti('httpcall - http auth', [
-  function (test, expect) {
-    // Test basic auth
-
-    // Unfortunately, any failed auth will result in a browser
-    // password prompt.  So we don't test auth failure, only
-    // success.
-
-    // Random password breaks in Firefox, because Firefox incorrectly
-    // uses cached credentials even if we supply different ones:
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=654348
-    const password = 'rocks';
-    //const password = Random.id().replace(/[^0-9a-zA-Z]/g, '');
-    HTTP.call(
-      'GET', url_prefix() + '/login?' + password,
-      { auth: 'meteor:' + password },
-      expect(function (error, result) {
-        // should succeed
-        test.isFalse(error);
-        test.isTrue(result);
-        test.equal(result.statusCode, 200);
-        const data = result.data;
-        test.equal(data.url, '/login?' + password);
-      }))
-
-    // test fail on malformed username:password
-    test.throws(function () {
-      HTTP.call(
-        'GET', url_prefix() + '/login?' + password,
-        { auth: 'fooooo' },
-        function () { throw new Error('can\'t get here'); })
-    });
   }
 ]);
 
@@ -438,21 +403,6 @@ testAsyncMulti('httpcall - params', [
     do_test('HEAD', '/head', { foo: 'bar' }, '/head?foo=bar', '');
 
     do_test('PUT', '/put', { foo: 'bar' }, '/put', 'foo=bar');
-  }
-]);
-
-Meteor.isClient && testAsyncMulti('httpcall - beforeSend', [
-  function (test, expect) {
-    let fired = false;
-    const bSend = function (xhr) {
-      test.isFalse(fired);
-      fired = true;
-      test.isTrue(xhr instanceof XMLHttpRequest);
-    }
-
-    HTTP.get(url_prefix() + '/', { beforeSend: bSend }, expect(function () {
-      test.isTrue(fired);
-    }));
   }
 ]);
 

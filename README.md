@@ -56,7 +56,7 @@ Or migrate to:
 3. If there is an error (400 or over), this will no longer return an Error object.
     It will simply return the response from the server as it does with all other status codes.
 
-4. The tests are broken! I plan on fixing them.
+4. The tests are broken (13 out of 15 are passing)! I plan on fixing them.
 
 5. There is no longer an 'auth' option.  To declare 'auth' use the headers section.
 
