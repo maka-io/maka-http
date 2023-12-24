@@ -18,10 +18,10 @@ class HTTPClient extends HTTPCommon {
 
     try {
       let attempts = 0;
-      const maxRetries = options.maxRetries ?? 1;
-      let retryDelay = options.retryDelay ?? 1000;
+      const maxRetries = options.maxRetries ?? this.MAX_RETRIES;
+      let retryDelay = options.retryDelay ?? this.RETRY_DELAY;
 
-      while (attempts < maxRetries) {
+      while (attempts <= maxRetries) {
         try {
           for (const interceptor of this.requestInterceptors) {
             const result = await interceptor(method, url, options, callback);
@@ -30,7 +30,7 @@ class HTTPClient extends HTTPCommon {
           }
 
           const headers: HeadersInit = new Headers(options.headers || {});
-          const body: BodyInit | null = options.data ? JSON.stringify(options.data) : options.content;
+          const body: BodyInit | null = options.data ? JSON.stringify(options.data) : options.data;
           if (options.data) headers.set('Content-Type', 'application/json');
 
           const fetchPromise = fetch(url, { method, headers, body }).then(async response => {

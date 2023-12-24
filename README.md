@@ -58,7 +58,8 @@ Or migrate to:
 
 4. The tests are broken (13 out of 15 are passing)! I plan on fixing them.
 
-5. There is no longer an 'auth' option.  To declare 'auth' use the headers section.
+5. There is no longer an 'auth', `param`, `query`, or `content` option, you'll need to make your own param string or
+    declare the `options.data` (rather than `options.content`. To declare 'auth' use the headers section.
 
 6. 'npmRequestOptions' and 'beforeSend' have been removed, not sure it actually did anything in the end 🤔.
     Instead of before send, use the new `HTTP.addRequestInterceptor()` method (see #7). If you need raw repsonse data,
@@ -93,17 +94,19 @@ NOTE: If you are using callbacks, then you should include callback in the return
 ```
 
 
-8. There are now two options for retries: `maxRetries` and `retryDelay`.  Default is `maxRetry: 1` and `retryDelay: 1000`
-    Retry delays are in miliseconds (so default is 1 second), and they are exponential.
+8. There are now two options for retries: `maxRetries` and `retryDelay`.  Default is `maxRetry: 0` (no retries)
+    and `retryDelay: 1000` (1 second). Retry delays are in miliseconds, and they are exponential.
     Usable on both Server and Client with the same interface.
 
 ```typescript
     const { data, statusCode } = await HTTP.get(url, {
       retryDelay: 2000,
       maxRetries: 3,
-      timeout: 2000
     });
 ```
+
+9. The timeout option is defaulted now to 30 seconds (30000 ms) instead of no default.
+
 
 See the [HTTP section in the Meteor docs](http://docs.meteor.com/#http) for more details...
 but with a grain of salt, based on the changes above, and that Meteor has deprecated those

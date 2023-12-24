@@ -7,6 +7,8 @@ import {
 
 class HTTPCommon {
   protected static MAX_LENGTH: number = 500;
+  protected static MAX_RETRIES: number = 0;
+  protected static RETRY_DELAY: number = 1000;
   protected static requestInterceptors: IHTTPCommon.RequestInterceptor[] = [];
   protected static responseInterceptors: IHTTPCommon.ResponseInterceptor[] = [];
 
