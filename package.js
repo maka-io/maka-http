@@ -1,7 +1,7 @@
 Package.describe({
   name: 'maka:http',
   summary: "Make HTTP calls to remote servers",
-  version: '1.1.8',
+  version: '1.1.9',
   git: 'https://github.com/maka-io/maka-http.git'
 });
 
