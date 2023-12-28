@@ -7,7 +7,7 @@ Package.describe({
 
 Npm.depends({
   '@types/meteor': '2.9.7',
-  '@maka/types': '1.0.6',
+  '@maka/types': '1.1.5',
   'node-fetch': '3.3.2'
 });
 
